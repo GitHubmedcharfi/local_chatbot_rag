@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgresql-pvc
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: local-ai-flowise
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  volumeName: postgresql-pv
+  resources:
+    requests:
+      storage: 30Gi

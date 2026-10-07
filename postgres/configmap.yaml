@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-init
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: local-ai-flowise
+data:
+  01-pgvector.sql: |
+    CREATE EXTENSION IF NOT EXISTS vector;
