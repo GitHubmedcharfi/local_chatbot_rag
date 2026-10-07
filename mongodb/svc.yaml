@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/part-of: local-ai-librechat
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: mongodb
+  ports:
+    - name: mongo
+      port: 27017
+      targetPort: mongo
