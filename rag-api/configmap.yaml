@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rag-api-config
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: rag-api
+    app.kubernetes.io/part-of: local-ai-librechat
+data:
+  RAG_HOST: "0.0.0.0"
+  RAG_PORT: "8000"
+  DEBUG_RAG_API: "False"
+  VECTOR_DB_TYPE: pgvector
+  DB_HOST: postgresql
+  DB_PORT: "5432"
+  COLLECTION_NAME: librechat_docs
+  EMBEDDINGS_PROVIDER: openai
+  EMBEDDINGS_MODEL: local-embedding
+  RAG_OPENAI_BASEURL: http://llm-embed:8081/v1
+  RAG_OPENAI_API_KEY: not-needed
+  RAG_CHECK_EMBEDDING_CTX_LENGTH: "false"
+  CHUNK_SIZE: "1500"
+  CHUNK_OVERLAP: "100"
+  EMBEDDING_BATCH_SIZE: "100"
+  EMBEDDINGS_CHUNK_SIZE: "32"
+  PARALLEL_EXECUTION: "1"
