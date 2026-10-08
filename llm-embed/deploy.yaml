@@ -1,0 +1,108 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-embed
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: llm-embed
+    app.kubernetes.io/part-of: local-ai-librechat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-embed
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-embed
+        app.kubernetes.io/part-of: local-ai-librechat
+    spec:
+      initContainers:
+        - name: download-model
+          image: curlimages/curl:8.10.1
+          securityContext:
+            runAsUser: 0
+          envFrom:
+            - configMapRef:
+                name: llm-embed-config
+          env:
+            - name: HF_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: hf-token
+                  key: HF_TOKEN
+                  optional: true
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              if [ -n "$MODEL_URL" ]; then
+                URL="$MODEL_URL"
+              else
+                URL="https://huggingface.co/$HF_REPO/resolve/main/$HF_FILE"
+              fi
+              FILE=$(basename "${URL%%\?*}")
+              if [ -f "/models/$FILE" ]; then
+                echo "Model $FILE already present"
+              else
+                echo "Downloading $URL"
+                if [ -n "$HF_TOKEN" ]; then
+                  curl -fL --retry 3 -H "Authorization: Bearer $HF_TOKEN" -o "/models/$FILE.tmp" "$URL"
+                else
+                  curl -fL --retry 3 -o "/models/$FILE.tmp" "$URL"
+                fi
+                mv "/models/$FILE.tmp" "/models/$FILE"
+              fi
+              ln -sfn "/models/$FILE" /models/active.gguf
+              echo "Active model: $FILE"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: llm-embed
+          image: ghcr.io/ggml-org/llama.cpp:server
+          envFrom:
+            - configMapRef:
+                name: llm-embed-config
+          command: ["/bin/sh", "-c"]
+          args:
+            - >
+              exec /app/llama-server
+              -m /models/active.gguf
+              --alias "$MODEL_ALIAS"
+              --embeddings
+              --host 0.0.0.0 --port 8080
+              -t "$THREADS" -c "$CTX_SIZE"
+              --metrics
+              $EXTRA_ARGS
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              cpu: 500m
+              memory: 1Gi
+            limits:
+              cpu: "1"
+              memory: 1536Mi
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llm-embed-models

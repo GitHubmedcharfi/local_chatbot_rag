@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: llm-embed-config
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: llm-embed
+    app.kubernetes.io/part-of: local-ai-librechat
+data:
+  HF_REPO: "ggml-org/bge-m3-Q8_0-GGUF"
+  HF_FILE: "bge-m3-q8_0.gguf"
+  MODEL_URL: ""
+  MODEL_ALIAS: "local-embedding"
+  THREADS: "1"
+  CTX_SIZE: "2048"
+  EXTRA_ARGS: ""

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-embed
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: llm-embed
+    app.kubernetes.io/part-of: local-ai-librechat
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: llm-embed
+  ports:
+    - name: http
+      port: 8081
+      targetPort: http
