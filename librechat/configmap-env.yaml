@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: librechat-env
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: librechat
+    app.kubernetes.io/part-of: local-ai-librechat
+data:
+  HOST: "0.0.0.0"
+  PORT: "3080"
+  RAG_API_URL: http://rag-api:8000
+  DOMAIN_CLIENT: http://158.158.3.96:30080
+  DOMAIN_SERVER: http://158.158.3.96:30080
+  ALLOW_REGISTRATION: "true"

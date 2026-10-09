@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: librechat
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: librechat
+    app.kubernetes.io/part-of: local-ai-librechat
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: librechat
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: librechat
+        app.kubernetes.io/part-of: local-ai-librechat
+    spec:
+      initContainers:
+        - name: fix-permissions
+          image: busybox:1.36
+          securityContext:
+            runAsUser: 0
+          command:
+            - sh
+            - -c
+            - |
+              mkdir -p /data/uploads /data/images
+              chown -R 1000:1000 /data
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      containers:
+        - name: librechat
+          image: ghcr.io/danny-avila/librechat:latest
+          ports:
+            - name: http
+              containerPort: 3080
+          envFrom:
+            - configMapRef:
+                name: librechat-env
+            - secretRef:
+                name: librechat-secret
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            periodSeconds: 10
+          volumeMounts:
+            - name: yaml
+              mountPath: /app/librechat.yaml
+              subPath: librechat.yaml
+            - name: data
+              mountPath: /app/uploads
+              subPath: uploads
+            - name: data
+              mountPath: /app/client/public/images
+              subPath: images
+            - name: logs
+              mountPath: /app/logs
+      volumes:
+        - name: yaml
+          configMap:
+            name: librechat-yaml
+        - name: data
+          persistentVolumeClaim:
+            claimName: librechat-pvc
+        - name: logs
+          emptyDir: {}

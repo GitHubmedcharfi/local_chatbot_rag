@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: librechat
+  namespace: local-ai
+  labels:
+    app.kubernetes.io/name: librechat
+    app.kubernetes.io/part-of: local-ai-librechat
+spec:
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: librechat
+  ports:
+    - name: http
+      port: 3080
+      targetPort: http
+      nodePort: 30080
