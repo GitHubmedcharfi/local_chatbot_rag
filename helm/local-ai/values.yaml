@@ -1,0 +1,28 @@
+# ---------- global ----------
+global:
+  labels:
+    app.kubernetes.io/part-of: local-ai
+
+# ---------- PostgreSQL + pgvector ----------
+postgresql:
+  enabled: true
+  image:
+    repository: pgvector/pgvector
+    tag: pg16
+  auth:
+    database: ragdb
+    username: raguser
+    existingSecret: postgresql-secret
+  service:
+    port: 5432
+  persistence:
+    size: 30Gi
+    storageClassName: manual
+    hostPath: /data/postgresql
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
