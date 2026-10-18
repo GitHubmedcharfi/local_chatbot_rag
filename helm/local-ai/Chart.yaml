@@ -4,3 +4,7 @@ description: Local CPU-only AI platform - LibreChat, RAG API, llama.cpp, Postgre
 type: application
 version: 0.1.0
 appVersion: "1.0.0"
+dependencies:
+  - name: librechat
+    version: 2.0.14
+    repository: oci://ghcr.io/danny-avila/librechat-chart
