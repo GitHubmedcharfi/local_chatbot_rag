@@ -1,0 +1,22 @@
+{{- range $key, $cfg := .Values.llm }}
+{{- if $cfg.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: llm-{{ $key }}-models
+  annotations:
+    helm.sh/resource-policy: keep
+  labels:
+    app.kubernetes.io/name: llm-{{ $key }}
+    app.kubernetes.io/part-of: local-ai
+spec:
+  accessModes: ["ReadWriteOnce"]
+  {{- if $cfg.persistence.storageClass }}
+  storageClassName: {{ $cfg.persistence.storageClass }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ $cfg.persistence.size }}
+{{- end }}
+{{- end }}

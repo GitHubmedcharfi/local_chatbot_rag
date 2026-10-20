@@ -1,0 +1,42 @@
+librechat:
+  enabled: true
+
+  image:
+    tag: "v0.8.8-rc4"
+
+  librechat:
+    configEnv:
+      DOMAIN_CLIENT: "http://chat.example.local"
+      DOMAIN_SERVER: "http://chat.example.local"
+      RAG_API_URL: "http://rag-api:8000"
+      SEARCH: "false"
+      ALLOW_REGISTRATION: "true"
+      SCHEDULES_SINGLE_PROCESS: "true"
+    configYamlContent: |
+      version: 1.3.17
+      cache: true
+      fileConfig:
+        endpoints:
+          "Local llama.cpp":
+            legacyFileUploadUX: false
+            defaultLLMDeliveryPath:
+              overrides:
+                "application/pdf": text
+      endpoints:
+        custom:
+          - name: "Local llama.cpp"
+            apiKey: "not-needed"
+            baseURL: "http://llm-chat:8080/v1"
+            models:
+              default: ["local-chat"]
+              fetch: false
+            titleConvo: false
+            modelDisplayLabel: "Local Chat"
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 768Mi

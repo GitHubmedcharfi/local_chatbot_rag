@@ -1,0 +1,17 @@
+ragApi:
+  enabled: true
+  image:
+    repository: ghcr.io/danny-avila/librechat-rag-api-dev-lite
+    tag: latest        # TODO: pin a real tag once it works
+  embeddings:
+    baseUrl: http://llm-embed:8080/v1
+    model: local-embed
+  extraEnv:
+    RAG_CHECK_EMBEDDING_CTX_LENGTH: "false"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi

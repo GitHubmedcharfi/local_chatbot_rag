@@ -1,0 +1,22 @@
+tls:
+  enabled: true
+  secretName: librechat-tls
+  host: chat.158-158-3-96.sslip.io
+
+librechat:
+  librechat:
+    configEnv:
+      DOMAIN_CLIENT: "https://chat.158-158-3-96.sslip.io"
+      DOMAIN_SERVER: "https://chat.158-158-3-96.sslip.io"
+  ingress:
+    enabled: true
+    className: traefik
+    hosts:
+      - host: chat.158-158-3-96.sslip.io
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - secretName: librechat-tls
+        hosts:
+          - chat.158-158-3-96.sslip.io

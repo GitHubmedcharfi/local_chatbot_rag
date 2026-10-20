@@ -1,0 +1,19 @@
+{{- range $key, $cfg := .Values.llm }}
+{{- if $cfg.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-{{ $key }}
+  labels:
+    app.kubernetes.io/name: llm-{{ $key }}
+    app.kubernetes.io/part-of: local-ai
+spec:
+  selector:
+    app.kubernetes.io/name: llm-{{ $key }}
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+{{- end }}
+{{- end }}

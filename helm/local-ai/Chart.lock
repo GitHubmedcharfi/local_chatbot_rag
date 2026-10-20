@@ -2,5 +2,5 @@ dependencies:
 - name: librechat
   repository: oci://ghcr.io/danny-avila/librechat-chart
   version: 2.0.14
-digest: sha256:82e46d12534efbe0bbf67977bbdf6f9db2fb6a63c96172806ce63d54111f77c1
-generated: "2026-10-18T17:38:39.791976412Z"
+digest: sha256:d622f4ef7bcf5891c3afc1b0ab137830035c5a8a3278655c36dcf4796082ecda
+generated: "2026-10-18T20:15:13.561339781Z"

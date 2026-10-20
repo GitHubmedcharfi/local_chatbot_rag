@@ -8,3 +8,4 @@ dependencies:
   - name: librechat
     version: 2.0.14
     repository: oci://ghcr.io/danny-avila/librechat-chart
+    condition: librechat.enabled

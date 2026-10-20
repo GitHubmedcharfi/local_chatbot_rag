@@ -1,0 +1,101 @@
+{{- range $key, $cfg := .Values.llm }}
+{{- if $cfg.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-{{ $key }}
+  labels:
+    app.kubernetes.io/name: llm-{{ $key }}
+    app.kubernetes.io/part-of: local-ai
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: llm-{{ $key }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: llm-{{ $key }}
+        app.kubernetes.io/part-of: local-ai
+    spec:
+      initContainers:
+        - name: download-model
+          image: "{{ $.Values.llmInit.image }}"
+          securityContext:
+            runAsUser: 0
+          env:
+            - name: MODEL_URL
+              value: {{ $cfg.model.url | quote }}
+            - name: MODEL_FILE
+              value: {{ $cfg.model.file | quote }}
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              if [ -s "/models/$MODEL_FILE" ]; then
+                echo "model already present"
+                exit 0
+              fi
+              curl -fL --retry 5 -o "/models/$MODEL_FILE.part" "$MODEL_URL"
+              mv "/models/$MODEL_FILE.part" "/models/$MODEL_FILE"
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: llama
+          image: "{{ $cfg.image.repository }}:{{ $cfg.image.tag }}"
+          args:
+            - -m
+            - /models/{{ $cfg.model.file }}
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8080"
+            - -t
+            - {{ $cfg.threads | quote }}
+            - -c
+            - {{ $cfg.contextSize | quote }}
+            - --alias
+            - {{ $cfg.model.alias | quote }}
+            - --metrics
+            {{- if $cfg.embeddings }}
+            - --embeddings
+            {{- end }}
+            {{- range $cfg.extraArgs }}
+            - {{ . | quote }}
+            {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            periodSeconds: 30
+            failureThreshold: 6
+          resources:
+            {{- toYaml $cfg.resources | nindent 12 }}
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: llm-{{ $key }}-models
+{{- end }}
+{{- end }}

@@ -1,0 +1,17 @@
+{{- if .Values.postgresql.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  labels:
+    app.kubernetes.io/name: postgresql
+    app.kubernetes.io/part-of: local-ai
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: postgresql
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+{{- end }}
