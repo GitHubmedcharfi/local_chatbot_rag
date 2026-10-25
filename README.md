@@ -79,18 +79,3 @@ Check:
 
 hostPath PVs are not removed with the namespace. Delete them explicitly if you want a clean disk.
 
-## Verification status
-
-| Step | What | Status |
-|---|---|---|
-| 1.1 | k3s, Traefik, namespace | CHECK |
-| 1.2 | PostgreSQL + pgvector (`\dx` shows `vector`) | CHECK |
-| 1.3 | MongoDB (pod Ready, port 27017) | CHECK |
-| 1.4 | llm-chat (`/v1/models`, `/v1/chat/completions`) | CHECK |
-| 1.5 | llm-embed (`/v1/embeddings` returns a vector) | CHECK |
-| 1.6 | rag-api (Ready, no DB errors) | CHECK |
-| 1.7 | LibreChat (UI reachable, data persists after restart) | CHECK |
-| 1.8 | Chat answered by the local model | CHECK |
-| 1.9 | Ingress with TLS, iframe embedding test | CHECK |
-| 1.10 | RAG test: grounded answer, rows in pgvector | CHECK |
-|
