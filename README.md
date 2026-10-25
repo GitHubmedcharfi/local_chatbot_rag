@@ -2,7 +2,7 @@
 
 CPU-only local chatbot and RAG on a single VM, deployed with plain Kubernetes YAML on k3s.
 LibreChat is the chat UI. No custom frontend or backend.
-This is the baseline for the Helm (approach 2) and Juju (approach 3) branches.
+This is the baseline for the Helm (approach 2) 
 
 ## Architecture
 
